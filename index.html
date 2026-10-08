@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Semana</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#3b82f6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Semana">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{--bg:#fff;--fg:#1e293b;--mut:#64748b;--line:#cbd5e1;--acc:#3b82f6;--soft:#f1f5f9;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f172a;--fg:#e2e8f0;--mut:#94a3b8;--line:#334155;--soft:#1e293b}}
+:root[data-theme="dark"]{--bg:#0f172a;--fg:#e2e8f0;--mut:#94a3b8;--line:#334155;--soft:#1e293b}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:640px;margin:0 auto;padding:20px 16px 40px}
+.hide{display:none!important}
+.days{display:flex;gap:8px;overflow-x:auto;padding:6px 2px 12px;scrollbar-width:none}
+.days::-webkit-scrollbar{display:none}
+.pill{position:relative;flex:1 0 auto;border:1px solid var(--line);background:none;color:var(--mut);font-weight:600;font-size:17px;font-family:inherit;padding:10px 16px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.pill b{font-weight:500;margin-left:6px}
+.pill.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.pill i{position:absolute;top:-2px;right:2px;width:10px;height:10px;border-radius:50%;background:var(--acc)}
+.pill.on i{display:none}
+.bar{display:flex;justify-content:space-between;align-items:center;margin:14px 0}
+h1{font-size:15px;font-weight:600;color:var(--mut);margin:0;text-transform:uppercase;letter-spacing:.06em}
+button{font-family:inherit}
+.btn{border:1px solid var(--line);background:none;color:var(--fg);padding:8px 14px;border-radius:999px;font-size:15px;cursor:pointer}
+.btn.p{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn.d{color:#ef4444;margin-right:auto}
+.item{border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:10px}
+.item.drag{opacity:.35}
+.item.bef{box-shadow:0 -3px 0 var(--acc)}
+.item.aft{box-shadow:0 3px 0 var(--acc)}
+.item[draggable=true]{cursor:grab}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.name{font-weight:600;word-break:break-word;flex:1}
+.grip{color:var(--mut);cursor:grab;user-select:none;letter-spacing:-3px;font-size:18px}
+.item.done .name{text-decoration:line-through;color:var(--mut)}
+.chk{flex:none;width:26px;height:26px;border-radius:8px;border:2px solid var(--line);background:none;cursor:pointer;color:#fff;font-size:16px;line-height:1;padding:0}
+.chk.on{background:var(--acc);border-color:var(--acc)}
+.more{background:none;border:0;color:var(--mut);font-size:14px;padding:8px 0 0;cursor:pointer}
+.det{margin-top:8px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.det p{margin:0;color:var(--mut);font-size:15px;white-space:pre-wrap;word-break:break-word}
+.empty{color:var(--mut);text-align:center;padding:40px 0}
+.out{display:block;margin:24px auto 0;background:none;border:0;color:var(--mut);font-size:13px;cursor:pointer}
+dialog{border:1px solid var(--line);border-radius:20px;background:var(--bg);color:var(--fg);width:min(440px,calc(100% - 32px));padding:20px}
+dialog::backdrop{background:rgba(0,0,0,.4)}
+label{display:block;font-size:13px;color:var(--mut);margin:12px 0 4px}
+input[type=text],input[type=password],textarea{width:100%;border:1px solid var(--line);border-radius:12px;background:var(--soft);color:var(--fg);padding:10px 12px;font:inherit;resize:vertical}
+.tg{display:flex;align-items:center;justify-content:space-between;margin-top:16px}
+.sw{appearance:none;-webkit-appearance:none;width:44px;height:26px;border-radius:999px;background:var(--line);position:relative;cursor:pointer;transition:.2s;margin:0}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.sw:checked{background:var(--acc)}
+.sw:checked::after{left:21px}
+.acts{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+#login form{width:min(340px,100%);display:flex;flex-direction:column;gap:12px;text-align:center}
+#login h2{margin:0 0 8px;font-size:22px}
+.pwb{position:relative}.pwb input{padding-right:78px}
+.pwb button{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--mut);font-size:13px;cursor:pointer;padding:8px}
+#err{color:#ef4444;font-size:14px;min-height:20px}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:.2s}
+#toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div id="login" class="hide">
+  <form id="lf">
+    <h2>Semana</h2>
+    <div class="pwb"><input type="password" id="pw" placeholder="Password" autocomplete="current-password" required><button type="button" id="eye">Mostrar</button></div>
+    <button class="btn p" type="submit">Entrar</button>
+    <div id="err"></div>
+  </form>
+</div>
+<main id="app" class="hide">
+  <div class="days" id="days"></div>
+  <div class="bar"><h1 id="title"></h1><button class="btn p" id="new">Criar item</button></div>
+  <div id="list"></div>
+  <button class="out" id="out">Sair</button>
+</main>
+<dialog id="dlg">
+  <h1 id="dt">Novo item</h1>
+  <label for="n">Nome</label><input type="text" id="n" maxlength="80">
+  <label for="d">Descrição (opcional)</label><textarea id="d" rows="3"></textarea>
+  <div class="tg"><span>Permitir marcar checkbox</span><input type="checkbox" class="sw" id="c" checked></div>
+  <div class="acts">
+    <button class="btn d" id="del" type="button">Eliminar</button>
+    <button class="btn" id="cancel" type="button">Cancelar</button>
+    <button class="btn p" id="save" type="button">Guardar</button>
+  </div>
+</dialog>
+<div id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+/* ===== CONFIGURAÇÃO ===== */
+const SUPABASE_URL='https://usssssckaurcuxdadbag.supabase.co';
+const SUPABASE_KEY='sb_publishable_WOh-WR9UrIFLgs9YtAOFMg_QaUbwPxD';
+const APP_PASSWORD='Checklist-Fontes';     // password da app
+/* ======================== */
+const NAMES=['Seg','Ter','Qua','Qui','Sex','Sáb','Dom','Anotações'];
+const FULL=['Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado','Domingo','Anotações'];
+const CACHE='semana-cache-v2',AUTH='semana-auth';
+const $=id=>document.getElementById(id);
+const fmt=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const monday=()=>{const x=new Date();x.setHours(0,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return x};
+const sb=window.supabase&&supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:false,autoRefreshToken:false}});
+let items=[],sel=(new Date().getDay()+6)%7,open=new Set(),editing=null;
+
+const isDone=it=>it.day===7?!!it.done_week:it.done_week===fmt(monday()); // Anotações (dia 7) nunca desmarca
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2500)}
+function el(t,props={},...kids){
+  const e=document.createElement(t);
+  for(const k in props){k==='class'?e.className=props[k]:k.startsWith('on')?e.addEventListener(k.slice(2),props[k]):e.setAttribute(k,props[k])}
+  kids.forEach(c=>e.append(c));return e;
+}
+function cacheSave(){try{localStorage.setItem(CACHE,JSON.stringify(items))}catch(e){}}
+
+async function fetchAll(){
+  const {data,error}=await sb.from('items').select('*').order('created_at');
+  if(error){toast('Sem ligação — a mostrar dados guardados');return}
+  items=data;cacheSave();render();
+}
+const DESK=matchMedia('(any-pointer:fine)').matches;
+let dragId=null;
+const pos=x=>x.position??Date.parse(x.created_at);
+const byPos=(a,b)=>pos(a)-pos(b);
+const clearMarks=()=>document.querySelectorAll('.bef,.aft').forEach(n=>n.classList.remove('bef','aft'));
+async function move(id,tid,after){
+  const day=items.filter(x=>x.day===sel).sort(byPos);
+  const a=day.find(x=>x.id===id);if(!a)return;
+  const rest=day.filter(x=>x!==a);
+  let i=rest.findIndex(x=>x.id===tid);if(i<0)return;if(after)i++;
+  rest.splice(i,0,a);
+  const changed=[];
+  rest.forEach((x,k)=>{if(x.position!==k){x.position=k;changed.push(x)}});
+  render();cacheSave();
+  const res=await Promise.all(changed.map(x=>sb.from('items').update({position:x.position}).eq('id',x.id)));
+  const bad=res.find(r=>r.error);
+  if(bad){toast('Erro ao guardar a ordem: '+bad.error.message);setTimeout(fetchAll,3000)}
+}
+function render(){
+  const m=monday(),days=$('days');days.replaceChildren();
+  NAMES.forEach((n,i)=>{
+    const d=new Date(m);d.setDate(m.getDate()+i);
+    const p=el('button',{class:'pill'+(i===sel?' on':''),onclick:()=>{sel=i;render()}},n,...(i<7?[el('b',{},String(d.getDate()))]:[]));
+    if(items.some(x=>x.day===i&&x.has_check&&!isDone(x)))p.append(el('i'));
+    days.append(p);
+  });
+  $('title').textContent=FULL[sel];
+  const list=$('list');list.replaceChildren();
+  const day=items.filter(x=>x.day===sel).sort(byPos);
+  if(!day.length){list.append(el('div',{class:'empty'},sel===7?'Sem anotações.':'Sem itens neste dia.'));return}
+  day.forEach(it=>{
+    const done=isDone(it);
+    const row=el('div',{class:'row'},el('span',{class:'name'},it.name));
+    if(DESK)row.prepend(el('span',{class:'grip',title:'Arrastar'},'⋮⋮'));
+    if(it.has_check)row.append(el('button',{class:'chk'+(done?' on':''),'aria-label':'Marcar',onclick:()=>toggle(it)},done?'✓':''));
+    const card=el('div',{class:'item'+(done?' done':'')},row);
+    if(DESK){
+      card.draggable=true;
+      card.addEventListener('dragstart',e=>{dragId=it.id;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',it.id);setTimeout(()=>card.classList.add('drag'),0)});
+      card.addEventListener('dragend',()=>{dragId=null;clearMarks();render()});
+      card.addEventListener('dragover',e=>{
+        if(!dragId||dragId===it.id)return;
+        e.preventDefault();
+        const r=card.getBoundingClientRect(),after=e.clientY>r.top+r.height/2;
+        clearMarks();card.classList.add(after?'aft':'bef');
+      });
+      card.addEventListener('drop',e=>{
+        e.preventDefault();
+        const r=card.getBoundingClientRect(),after=e.clientY>r.top+r.height/2;
+        const id=dragId;dragId=null;clearMarks();
+        if(id&&id!==it.id)move(id,it.id,after);
+      });
+    }
+    const isOpen=open.has(it.id);
+    card.append(el('button',{class:'more',onclick:()=>{isOpen?open.delete(it.id):open.add(it.id);render()}},isOpen?'Ver menos':'Ver mais'));
+    if(isOpen){
+      const det=el('div',{class:'det'});
+      if(it.descr)det.append(el('p',{},it.descr));
+      det.append(el('button',{class:'btn',onclick:()=>openDlg(it)},'Editar'));
+      card.append(det);
+    }
+    list.append(card);
+  });
+}
+async function toggle(it){
+  const old=it.done_week;
+  it.done_week=isDone(it)?null:(it.day===7?'2000-01-01':fmt(monday()));
+  render();cacheSave();
+  const {error}=await sb.from('items').update({done_week:it.done_week}).eq('id',it.id);
+  if(error){it.done_week=old;render();cacheSave();toast('Não foi possível guardar')}
+}
+function openDlg(it){
+  editing=it||null;
+  $('dt').textContent=it?'Editar item':'Novo item';
+  $('n').value=it?it.name:'';$('d').value=it?it.descr:'';$('c').checked=it?it.has_check:true;
+  $('del').style.display=it?'':'none';
+  $('dlg').showModal();$('n').focus();
+}
+$('new').onclick=()=>openDlg();
+$('cancel').onclick=()=>$('dlg').close();
+$('save').onclick=async()=>{
+  const name=$('n').value.trim();
+  if(!name){$('n').focus();return}
+  const v={name,descr:$('d').value.trim(),has_check:$('c').checked};
+  if(!v.has_check)v.done_week=null;
+  $('save').disabled=true;
+  if(editing){
+    const {error}=await sb.from('items').update(v).eq('id',editing.id);
+    if(error)toast('Não foi possível guardar');else Object.assign(editing,v);
+  }else{
+    const {data,error}=await sb.from('items').insert({day:sel,position:Date.now(),...v}).select().single();
+    if(error)toast('Não foi possível guardar');else items.push(data);
+  }
+  $('save').disabled=false;$('dlg').close();cacheSave();render();
+};
+$('del').onclick=async()=>{
+  if(!editing||!confirm('Eliminar este item?'))return;
+  const {error}=await sb.from('items').delete().eq('id',editing.id);
+  if(error)toast('Não foi possível eliminar');else items=items.filter(x=>x!==editing);
+  $('dlg').close();cacheSave();render();
+};
+
+$('eye').onclick=()=>{const h=$('pw').type==='password';$('pw').type=h?'text':'password';$('eye').textContent=h?'Esconder':'Mostrar'};
+/* Login (pedido só uma vez: fica guardado no dispositivo) */
+$('lf').onsubmit=async e=>{
+  e.preventDefault();$('err').textContent='';
+  if($('pw').value!==APP_PASSWORD){$('err').textContent='Password errada';return}
+  try{localStorage.setItem(AUTH,APP_PASSWORD)}catch(e){}
+  $('pw').value='';start();
+};
+$('out').onclick=async()=>{try{localStorage.removeItem(AUTH)}catch(e){}try{localStorage.removeItem(CACHE)}catch(e){}items=[];$('app').classList.add('hide');$('login').classList.remove('hide')};
+function start(){
+  $('login').classList.add('hide');$('app').classList.remove('hide');
+  try{items=JSON.parse(localStorage.getItem(CACHE))||[]}catch(e){items=[]}
+  render();fetchAll();
+}
+async function init(){
+  if(!sb){document.body.textContent='Não foi possível carregar o Supabase.';return}
+  let ok=false;try{ok=localStorage.getItem(AUTH)===APP_PASSWORD}catch(e){}
+  ok?start():$('login').classList.remove('hide');
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!$('app').classList.contains('hide'))fetchAll()});
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+init();
+</script>
+</body>
+</html>
